@@ -1,6 +1,6 @@
-# AMAD Lab 03 – MVVM, ViewModel and navigation
+# MVVM Task Manager
 
-Android app for Lab Report 03 of Advanced Mobile Application Development (2026/2027). The task list from lab 02 rebuilt in the MVVM architecture: a repository as the single source of truth, a view model with one UI state per screen, unidirectional data flow and Navigation Compose with type-safe routes.
+AMAD Lab 03 – MVVM, ViewModel and navigation. Android app for Lab Report 03 of Advanced Mobile Application Development (2026/2027). The task list from lab 02 rebuilt in the MVVM architecture: a repository as the single source of truth, a view model with one UI state per screen, unidirectional data flow and Navigation Compose with type-safe routes.
 
 | Task | What it adds |
 |---|---|
