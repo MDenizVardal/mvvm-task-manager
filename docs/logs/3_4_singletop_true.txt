@@ -1,0 +1,4 @@
+11-14 18:32:06.769 D/BackStack(16892): top = TaskList, entry 8eda72ad
+11-14 18:32:10.891 D/BackStack(16892): singleTop=true, entry below the top = TaskList
+11-14 18:32:10.893 D/BackStack(16892): top = Statistics, entry 8ffde5ff
+11-14 18:32:13.971 D/BackStack(16892): top = TaskList, entry 8eda72ad

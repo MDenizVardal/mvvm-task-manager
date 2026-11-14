@@ -1,0 +1,5 @@
+11-14 18:31:46.190 D/BackStack(16742): top = TaskList, entry 10cde36e
+11-14 18:31:50.370 D/BackStack(16742): singleTop=false, entry below the top = Statistics
+11-14 18:31:50.371 D/BackStack(16742): top = Statistics, entry 57879ff7
+11-14 18:31:53.467 D/BackStack(16742): top = Statistics, entry 99cfadee
+11-14 18:31:55.800 D/BackStack(16742): top = TaskList, entry 10cde36e

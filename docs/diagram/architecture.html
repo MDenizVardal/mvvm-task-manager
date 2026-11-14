@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>AmadLab architecture</title>
+<style>
+  html, body { margin: 0; background: #ffffff; }
+  text { font-family: 'Segoe UI', Arial, sans-serif; fill: #1b1b1b; }
+  .mono { font-family: Consolas, 'Cascadia Mono', monospace; }
+  .title { font-size: 21px; font-weight: 700; }
+  .sub { font-size: 14px; fill: #444; }
+  .layer { font-size: 15px; font-weight: 700; fill: #6b7280; letter-spacing: 1px; }
+  .state { stroke: #0b7a3e; stroke-width: 3; fill: none; }
+  .event { stroke: #c2410c; stroke-width: 3; fill: none; }
+  .nav { stroke: #6b7280; stroke-width: 2.2; fill: none; stroke-dasharray: 7 5; }
+  .lstate { font-size: 13px; fill: #0b7a3e; font-weight: 600; }
+  .levent { font-size: 13px; fill: #c2410c; font-weight: 600; }
+  .lnav { font-size: 12.5px; fill: #4b5563; }
+</style></head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1130" viewBox="0 0 1500 1130">
+  <defs>
+    <marker id="aS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0b7a3e"/></marker>
+    <marker id="aE" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c2410c"/></marker>
+    <marker id="aN" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker>
+  </defs>
+
+  <!-- layer labels -->
+  <text x="20" y="30" class="layer">DATA LAYER (MODEL)</text>
+  <text x="365" y="302" class="layer">UI LAYER: VIEW MODELS</text>
+  <text x="365" y="580" class="layer">UI LAYER: COMPOSABLES</text>
+
+  <!-- repository: single source of truth -->
+  <rect x="60" y="45" width="1380" height="150" rx="14" fill="#fff4d6" stroke="#b7791f" stroke-width="3"/>
+  <rect x="1150" y="58" width="270" height="34" rx="17" fill="#b7791f"/>
+  <text x="1285" y="81" text-anchor="middle" style="font-size:15px;font-weight:700;fill:#fff">SINGLE SOURCE OF TRUTH</text>
+  <text x="90" y="85" class="title">object TaskRepository</text>
+  <text x="90" y="115" class="sub mono">private val _tasks = MutableStateFlow&lt;List&lt;Task&gt;&gt;(...)   – only the repository changes the list</text>
+  <text x="90" y="140" class="sub mono">val tasks: StateFlow&lt;List&lt;Task&gt;&gt; = _tasks.asStateFlow()     – everybody else only reads</text>
+  <text x="90" y="170" class="sub mono">fun add(title)   fun toggle(id)   fun delete(id)   fun rename(id, title)   fun find(id)</text>
+
+  <!-- view models -->
+  <g>
+    <rect x="60" y="315" width="420" height="160" rx="12" fill="#e6f4f1" stroke="#00696b" stroke-width="2.5"/>
+    <text x="80" y="348" class="title">TasksViewModel</text>
+    <text x="80" y="375" class="sub mono">private newTitle, filter: MutableStateFlow</text>
+    <text x="80" y="400" class="sub mono">uiState = combine(repository.tasks,</text>
+    <text x="80" y="420" class="sub mono">          newTitle, filter) {...}.stateIn(...)</text>
+    <text x="80" y="450" class="sub mono">: StateFlow&lt;TasksUiState&gt;</text>
+
+    <rect x="540" y="315" width="420" height="160" rx="12" fill="#e6f4f1" stroke="#00696b" stroke-width="2.5"/>
+    <text x="560" y="348" class="title">TaskDetailViewModel</text>
+    <text x="560" y="375" class="sub mono">taskId = savedStateHandle</text>
+    <text x="560" y="395" class="sub mono">         .toRoute&lt;TaskDetail&gt;().taskId</text>
+    <text x="560" y="420" class="sub mono">uiState = combine(tasks.map{find}, editedTitle)</text>
+    <text x="560" y="450" class="sub mono">: StateFlow&lt;TaskDetailUiState&gt;</text>
+
+    <rect x="1020" y="315" width="420" height="160" rx="12" fill="#e6f4f1" stroke="#00696b" stroke-width="2.5"/>
+    <text x="1040" y="348" class="title">StatisticsViewModel</text>
+    <text x="1040" y="375" class="sub mono">uiState = repository.tasks</text>
+    <text x="1040" y="395" class="sub mono">   .map { StatisticsUiState(total, done) }</text>
+    <text x="1040" y="420" class="sub mono">   .stateIn(...)</text>
+    <text x="1040" y="450" class="sub mono">: StateFlow&lt;StatisticsUiState&gt;</text>
+  </g>
+
+  <!-- repository -> view models: state down, events up -->
+  <line x1="200" y1="195" x2="200" y2="313" class="state" marker-end="url(#aS)"/>
+  <line x1="340" y1="313" x2="340" y2="197" class="event" marker-end="url(#aE)"/>
+  <text x="80" y="240" class="lstate">tasks</text><text x="80" y="256" class="lstate">(StateFlow)</text>
+  <text x="352" y="240" class="levent">add(title)</text><text x="352" y="256" class="levent">toggle(id)</text>
+
+  <line x1="680" y1="195" x2="680" y2="313" class="state" marker-end="url(#aS)"/>
+  <line x1="820" y1="313" x2="820" y2="197" class="event" marker-end="url(#aE)"/>
+  <text x="560" y="240" class="lstate">tasks</text><text x="560" y="256" class="lstate">(StateFlow)</text>
+  <text x="832" y="232" class="levent">rename(id, title)</text><text x="832" y="248" class="levent">toggle(id)</text><text x="832" y="264" class="levent">delete(id)</text>
+
+  <line x1="1230" y1="195" x2="1230" y2="313" class="state" marker-end="url(#aS)"/>
+  <text x="1110" y="240" class="lstate">tasks</text><text x="1110" y="256" class="lstate">(StateFlow)</text>
+  <text x="1245" y="248" class="lnav">(read only – no events)</text>
+
+  <!-- NavHost container -->
+  <rect x="40" y="585" width="1420" height="520" rx="16" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" stroke-dasharray="10 6"/>
+  <text x="60" y="1010" style="font-size:15px;font-weight:700;fill:#475569">MainActivity</text><text x="60" y="1032" class="sub mono">setContent {</text><text x="60" y="1052" class="sub mono">  AmadLabTheme {</text><text x="60" y="1072" class="sub mono">    AmadLabNavHost() } }</text>
+
+  <!-- routes + screens -->
+  <g>
+    <rect x="60" y="630" width="420" height="190" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="2.5"/>
+    <text x="80" y="662" class="title">TaskListRoute</text>
+    <text x="80" y="686" class="sub">viewModel(), collectAsStateWithLifecycle()</text>
+    <rect x="80" y="700" width="380" height="100" rx="8" fill="#fff" stroke="#818cf8"/>
+    <text x="95" y="728" style="font-size:17px;font-weight:700">TaskListScreen (stateless)</text>
+    <text x="95" y="752" class="sub">text field + Add, filter buttons All/Active/Done,</text>
+    <text x="95" y="772" class="sub">LazyColumn of TaskRow, TextButton "Statistics"</text>
+
+    <rect x="540" y="630" width="420" height="190" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="2.5"/>
+    <text x="560" y="662" class="title">TaskDetailRoute</text>
+    <text x="560" y="686" class="sub">viewModel() – one per opened task</text>
+    <rect x="560" y="700" width="380" height="100" rx="8" fill="#fff" stroke="#818cf8"/>
+    <text x="575" y="728" style="font-size:17px;font-weight:700">TaskDetailScreen (stateless)</text>
+    <text x="575" y="752" class="sub">title, status, OutlinedTextField + Save,</text>
+    <text x="575" y="772" class="sub">Mark as done, Delete, Back</text>
+
+    <rect x="1020" y="630" width="420" height="190" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="2.5"/>
+    <text x="1040" y="662" class="title">StatisticsRoute</text>
+    <text x="1040" y="686" class="sub">viewModel(), collectAsStateWithLifecycle()</text>
+    <rect x="1040" y="700" width="380" height="100" rx="8" fill="#fff" stroke="#818cf8"/>
+    <text x="1055" y="728" style="font-size:17px;font-weight:700">StatisticsScreen (stateless)</text>
+    <text x="1055" y="752" class="sub">all, done, remaining, done %,</text>
+    <text x="1055" y="772" class="sub">LinearProgressIndicator, Back</text>
+  </g>
+
+  <!-- view models -> routes: state down, events up -->
+  <line x1="200" y1="475" x2="200" y2="628" class="state" marker-end="url(#aS)"/>
+  <line x1="340" y1="628" x2="340" y2="477" class="event" marker-end="url(#aE)"/>
+  <text x="80" y="520" class="lstate">uiState:</text><text x="80" y="536" class="lstate">TasksUiState</text>
+  <text x="352" y="512" class="levent">onTitleChange</text><text x="352" y="528" class="levent">addTask</text><text x="352" y="544" class="levent">toggle(id)</text><text x="352" y="560" class="levent">onFilterChange</text>
+
+  <line x1="680" y1="475" x2="680" y2="628" class="state" marker-end="url(#aS)"/>
+  <line x1="820" y1="628" x2="820" y2="477" class="event" marker-end="url(#aE)"/>
+  <text x="560" y="520" class="lstate">uiState:</text><text x="560" y="536" class="lstate">TaskDetailUiState</text>
+  <text x="832" y="512" class="levent">onTitleChange</text><text x="832" y="528" class="levent">save()</text><text x="832" y="544" class="levent">toggle()</text><text x="832" y="560" class="levent">delete()</text>
+
+  <line x1="1230" y1="475" x2="1230" y2="628" class="state" marker-end="url(#aS)"/>
+  <text x="1110" y="520" class="lstate">uiState:</text><text x="1110" y="536" class="lstate">StatisticsUiState</text>
+
+  <!-- navigation -->
+  <rect x="380" y="935" width="740" height="150" rx="12" fill="#f1f5f9" stroke="#64748b" stroke-width="2.5"/>
+  <text x="400" y="967" class="title">AmadLabNavHost  (NavController + back stack)</text>
+  <text x="400" y="995" class="sub mono">@Serializable object TaskList          – start destination</text>
+  <text x="400" y="1019" class="sub mono">@Serializable data class TaskDetail(val taskId: Long)</text>
+  <text x="400" y="1043" class="sub mono">@Serializable object Statistics        – launchSingleTop = true</text>
+  <text x="400" y="1069" class="sub">The screens never get the NavController – they only call lambdas.</text>
+
+  <path d="M200,820 L200,900 L470,900 L470,933" class="nav" marker-end="url(#aN)"/>
+  <text x="212" y="850" class="lnav">onTaskClick(id) → navigate(TaskDetail(id))</text>
+  <text x="212" y="868" class="lnav">onStatisticsClick → navigate(Statistics)</text>
+  <path d="M750,820 L750,933" class="nav" marker-end="url(#aN)"/>
+  <text x="762" y="860" class="lnav">onBack / Save / Delete</text>
+  <text x="762" y="878" class="lnav">→ popBackStack()</text>
+  <path d="M1230,820 L1230,900 L1030,900 L1030,933" class="nav" marker-end="url(#aN)"/>
+  <text x="1245" y="860" class="lnav">onBack → popBackStack()</text>
+
+  <!-- legend -->
+  <rect x="1170" y="935" width="270" height="150" rx="10" fill="#fff" stroke="#cbd5e1"/>
+  <text x="1185" y="960" style="font-size:15px;font-weight:700">Legend</text>
+  <line x1="1185" y1="985" x2="1235" y2="985" class="state" marker-end="url(#aS)"/><text x="1245" y="990" class="lstate">state flows down</text>
+  <line x1="1185" y1="1015" x2="1235" y2="1015" class="event" marker-end="url(#aE)"/><text x="1245" y="1020" class="levent">events flow up</text>
+  <line x1="1185" y1="1045" x2="1235" y2="1045" class="nav" marker-end="url(#aN)"/><text x="1245" y="1050" class="lnav">navigation event</text>
+  <rect x="1185" y="1062" width="16" height="14" fill="#fff4d6" stroke="#b7791f" stroke-width="2"/><text x="1209" y="1074" class="lnav">single source of truth</text>
+</svg>
+</body></html>

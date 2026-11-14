@@ -1,0 +1,8 @@
+11-14 18:26:28.515 D/ViewModel(15376): TasksViewModel created
+11-14 18:26:28.843 D/BackStack(15376): top = TaskList, entry b31a71ef
+11-14 18:26:52.586 D/BackStack(15376): top = TaskList, entry b31a71ef
+11-14 18:26:54.429 D/BackStack(15376): top = TaskList, entry b31a71ef
+11-14 18:26:58.937 D/BackStack(15376): top = TaskDetail/{taskId}, entry 62194dbf
+11-14 18:26:58.952 D/ViewModel(15376): TaskDetailViewModel created for task 4
+11-14 18:27:01.411 D/BackStack(15376): top = TaskDetail/{taskId}, entry 62194dbf
+11-14 18:27:04.648 D/BackStack(15376): top = TaskDetail/{taskId}, entry 62194dbf
